@@ -1,11 +1,22 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
 
 //Person komponentti palauttaa yhdin listan osan jossa näkyy henkilön nimi ja numero
-const Person = ({person}) => {
+const Person = ({person, deletePerson}) => {
   return (
-    <li>{person.name} {person.number}</li>
+    <li>
+      {person.name} {person.number}
+      <Button id={person.id} deletePerson={deletePerson}/>
+    </li>
+  )
+}
+
+const Button = ({id, deletePerson}) => {
+
+  return(
+    <button value={id} onClick={deletePerson}>delete</button>
   )
 }
 
@@ -30,11 +41,16 @@ const PersonForm = ({addPerson, newName, handleNameChange, newNumber, handleNumb
 
 //Persons komponentti palauttaa listan henkilöitä Part komponentissa
 //palautuksessa ensin filtteröidään käyttäjän antaman syötteen mukaan henkilöt ja lopulta mapataan ne nätisti Person komponentin mukaisiksi
-const Persons = ({persons, filterName}) => {
+const Persons = ({persons, filterName, deletePerson}) => {
 
   return (
     <ul>
-      {persons.filter(person => person.name.toLowerCase().includes(filterName.toLocaleLowerCase())).map((person, i) => <Person key={i} person={person}/>)}
+      {persons.filter(person =>
+         person.name.toLowerCase()
+         .includes(filterName.toLocaleLowerCase()))
+         .map((person, i) =>
+         <Person key={i} person={person} deletePerson={deletePerson}/>
+         )}
     </ul>
   )
 
@@ -49,10 +65,10 @@ const App = () => {
 
   //haetaan persons listaan oliot json serveriltä effect hookilla
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initialPerson => {
+        setPersons(initialPerson)
       })
   }, [])
 
@@ -61,6 +77,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  
 
   
   //handleNameChange tallentaa käyttäjän inputin muuttujaan newName
@@ -90,8 +107,24 @@ const App = () => {
         number: newNumber
       }
 
-      setPersons(persons.concat(newPerson))
+      personService
+        .create(newPerson)
+          .then(returnedPerson => {
+            setPersons(persons.concat(returnedPerson))
+          })  
     }
+  }
+
+  const deletePerson = (event) => {
+    event.preventDefault()
+    const id = event.target.value
+
+    personService
+      .deleteObject(id)
+        .then(newPersons => {
+          setPersons(persons.filter(person => person.id !== id))
+        })
+
   }
 
 
@@ -109,7 +142,7 @@ const App = () => {
       <h2>add a new</h2>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
       <h2>Numbers</h2>
-      <Persons persons={persons} filterName={filterName}/>
+      <Persons persons={persons} filterName={filterName} deletePerson={deletePerson}/>
     </div>
   )
 
