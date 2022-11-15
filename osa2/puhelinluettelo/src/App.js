@@ -100,7 +100,18 @@ const App = () => {
     
     //tarkistetaan mikäli uusi nimi on jo henkilöllä
     if (personsName.includes(newName)) {
-      alert(newName + ' is already added to phonebook')
+      if (window.confirm(newName + ' is already added to phonebook, replace the old number with a new one?')){
+        const newPerson = {
+          name: newName,
+          number: newNumber
+        }
+        personService
+        .create(newPerson)
+          .then(returnedPerson => {
+            setPersons(persons.concat(returnedPerson))
+          })  
+      }
+
     } else {
       const newPerson = {
         name: newName,
@@ -118,13 +129,22 @@ const App = () => {
   const deletePerson = (event) => {
     event.preventDefault()
     const id = event.target.value
+    console.log(id)
+    console.log()
 
-    personService
+    const personToDelete = persons.filter(person => person.id === parseInt(id))
+    console.log(personToDelete)
+    
+    /* const personToDelete =  persons.filter(person => person.id !== parseInt(idd))
+    console.log(personToDelete) */
+
+    if (window.confirm("Delete " + personToDelete[0].name)) {
+      personService
       .deleteObject(id)
-        .then(newPersons => {
-          setPersons(persons.filter(person => person.id !== id))
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== parseInt(id)))
         })
-
+    }
   }
 
 
