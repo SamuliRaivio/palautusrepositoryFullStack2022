@@ -101,15 +101,38 @@ const App = () => {
     //tarkistetaan mikäli uusi nimi on jo henkilöllä
     if (personsName.includes(newName)) {
       if (window.confirm(newName + ' is already added to phonebook, replace the old number with a new one?')){
+
         const newPerson = {
           name: newName,
           number: newNumber
         }
+
+        const personToUpdate = persons.filter(person => person.name === newName)
+
+        console.log(personToUpdate)
+        console.log(personToUpdate.id)
+
+        const personId = parseInt(personToUpdate[0].id)
+
+        console.log(personId)
+        
+
+
         personService
-        .create(newPerson)
+        .update(personId, newPerson)
           .then(returnedPerson => {
-            setPersons(persons.concat(returnedPerson))
+            setPersons(persons.map( person => {
+              if (person.id === personId) {
+                return(
+                  {...person, number: newNumber}
+                ) }
+                return (
+                  person
+                )
+              }
+            ))
           })  
+          console.log(persons)
       }
 
     } else {
