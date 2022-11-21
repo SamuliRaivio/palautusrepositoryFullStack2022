@@ -104,6 +104,8 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
+
+   
   //addPerson tallentaa nappia painamalla käyttäjän antaman nimen muuttujasta newName objetkijonoon uudeksi henkilöksi 
   //addPerson myös tunnistaa mikäli käyttäjä antaa nimen joka jo jollain henkilöllä on ja antaa virheilmoituksen
   const addPerson = (event) => {
@@ -117,46 +119,61 @@ const App = () => {
       
       //jos nimi on jo listalla tulostuu alertti, jos alertista painaa ok 
       if (window.confirm(newName + ' is already added to phonebook, replace the old number with a new one?')){
-        //haetaan henkilön jolla jo sama nimi ja ketä halutaan päivittää
-        const personToUpdate = persons.filter(person => person.name === newName)
-        console.log(personToUpdate[0])
 
-        //tallennetaan ilmoitukselle uusi ilmoitus ja tyyli
+        //vaihdetaan ilmoituksen viesti ja tyyli
         setNotification(newName + ' number changed')
         setNotificationStyle('notificationNumberChange')
 
-        //luodaan uusi päivitettävä henkilö
+        //luodaan uusi henkilöolio joka vaihdetaan vanhaan "päivityksenä"
         const newPerson = {
           name: newName,
           number: newNumber
         }
 
+        //haetaan listasta henkilö jota halutaan päivittää
+        const personToUpdate = persons.filter(person => person.name === newName)
+
+        console.log(personToUpdate)
+        console.log(personToUpdate.id)
+
+        const personId = parseInt(personToUpdate[0].id)
+
+        console.log(personId)
+        
+
+        //päivitettään henkilö tietokannassa ja annetaan listalle uusi arvo jossa päivitetyn henkilön tiedot on muutettu
         personService
-          .update(personToUpdate[0].id, newPerson)
-            .then(returnedPerson => {
-
-              setPersons(persons.map(person => {
-                if (person.di === parseInt(personToUpdate[0].id)) {
-                  return {...person, }
-                }
-              } person.id ? parseInt(personToUpdate[0].id) : returnedPerson.data))
-              console.log(persons)
-              
-            })
-            setTimeout(() => {
-              setNotification(null)
-              setNotificationStyle('')
-            }, 3000)
+        .update(personId, newPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map( person => {
+              if (person.id === personId) {
+                return(
+                  {...person, number: newNumber}
+                ) }
+                return (
+                  person
+                )
+              }
+            ))
+          })  
+          console.log(persons)
       }
-
+    
     } else {
+
+      //muuten jos listasta ei vielä löydy käyttäjän antamaa nimeä vastaava henkilö, luodaan uusi henkilö listaan
+
+      //vaihdetaan ilmoituksen viesti ja tyyli
       setNotification('Added ' + newName)
       setNotificationStyle('notificationAdd')
+
+      //luodaan uusi henkilö käyttäjän antamilla tiedoilla
       const newPerson = {
         name: newName,
         number: newNumber
       }
 
+      //lisätään henkilö tietokantaan ja luodaan uusi lista henkilöitä joissa tämä uusi on mukana
       personService
         .create(newPerson)
           .then(returnedPerson => {
@@ -169,26 +186,31 @@ const App = () => {
     }
   }
 
+  //Delete napin painaminen saa aikaan tämän tapahtumakäsittelijän
   const deletePerson = (event) => {
     event.preventDefault()
     const id = event.target.value
     console.log(id)
     console.log()
 
+    //haetaan poistettava henkilö
     const personToDelete = persons.filter(person => person.id === parseInt(id))
     console.log(personToDelete)
     
-    /* const personToDelete =  persons.filter(person => person.id !== parseInt(idd))
-    console.log(personToDelete) */
-
+    
+    //window.confirm varmistaa henkilön poistamisesta, jos varmistukseen painaa ok, poistetaan henkilö luettelosta
     if (window.confirm("Delete " + personToDelete[0].name)) {
+
+      //vaihdetaan ilmoituksen viesti ja tyyli
       setNotification(personToDelete[0].name + ' deleted')
       setNotificationStyle('notificationDeleted')
+
+      //poistetaan henkilö tietokannasta ja annetaan listalle uusi arvo, eli kopio listasta ilman kyseistä henkilöä
       personService
       .deleteObject(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== parseInt(id)))
-        })
+        }) //mikäli listasta yritetään poistaa henkilö, joka on jo poistettu, tulee virheilmoitus
         .catch(error => {
           setNotification('Information of ' + personToDelete[0].name + ' has already been removed from server')
         })
