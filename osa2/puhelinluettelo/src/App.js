@@ -1,24 +1,7 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import personService from './services/persons'
+import './App.css'
 
-
-//Person komponentti palauttaa yhdin listan osan jossa näkyy henkilön nimi ja numero
-const Person = ({person, deletePerson}) => {
-  return (
-    <li>
-      {person.name} {person.number}
-      <Button id={person.id} deletePerson={deletePerson}/>
-    </li>
-  )
-}
-
-const Button = ({id, deletePerson}) => {
-
-  return(
-    <button value={id} onClick={deletePerson}>delete</button>
-  )
-}
 
 //Filter komponentti ottaa käyttäjän syötteestä merkkijonon
 const Filter = ({filterName, filterPerson}) => {
@@ -26,7 +9,6 @@ const Filter = ({filterName, filterPerson}) => {
     <div>filter shown with <input value={filterName} onChange={filterPerson} /></div>
   )
 }
-
 
 //PersonForm komponentti ottaa käyttäjän syötteestä nimen ja numeron
 const PersonForm = ({addPerson, newName, handleNameChange, newNumber, handleNumberChange}) => {
@@ -56,6 +38,38 @@ const Persons = ({persons, filterName, deletePerson}) => {
 
 }
 
+//Person komponentti palauttaa yhden listan osan jossa näkyy henkilön nimi ja numero
+const Person = ({person, deletePerson}) => {
+  return (
+    <li>
+      {person.name} {person.number}
+      <Button id={person.id} deletePerson={deletePerson}/>
+    </li>
+  )
+}
+
+
+//Button komponentti palauttaa napin henkilötiedon poistamiseen
+const Button = ({id, deletePerson}) => {
+  return(
+    <button value={id} onClick={deletePerson}>delete</button>
+  )
+}
+
+//Notification komponentti tulostaa ilmoituksen näytölle mikäli muuttujalla notification on arvo
+//tulostus ja tulostuksen tyylit riippuvat siitä mistä syystä ilmoitus tulostetaan näytölle
+const Notification = ({notification, notificationStyle}) => {
+  if (notification === null) {
+    return null
+  }
+
+  return (
+    <div className={notificationStyle}>
+      {notification}
+    </div>
+  )
+}
+
 
 const App = () => {
 
@@ -72,11 +86,11 @@ const App = () => {
       })
   }, [])
 
-
-  //newName on uusi nimi joka luetaan käyttäjän inputista
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [notificationStyle, setNotificationStyle] = useState()
   
 
   
@@ -100,19 +114,44 @@ const App = () => {
     
     //tarkistetaan mikäli uusi nimi on jo henkilöllä
     if (personsName.includes(newName)) {
+      
+      //jos nimi on jo listalla tulostuu alertti, jos alertista painaa ok 
       if (window.confirm(newName + ' is already added to phonebook, replace the old number with a new one?')){
+        //haetaan henkilön jolla jo sama nimi ja ketä halutaan päivittää
+        const personToUpdate = persons.filter(person => person.name === newName)
+        console.log(personToUpdate[0])
+
+        //tallennetaan ilmoitukselle uusi ilmoitus ja tyyli
+        setNotification(newName + ' number changed')
+        setNotificationStyle('notificationNumberChange')
+
+        //luodaan uusi päivitettävä henkilö
         const newPerson = {
           name: newName,
           number: newNumber
         }
+
         personService
-        .create(newPerson)
-          .then(returnedPerson => {
-            setPersons(persons.concat(returnedPerson))
-          })  
+          .update(personToUpdate[0].id, newPerson)
+            .then(returnedPerson => {
+
+              setPersons(persons.map(person => {
+                if (person.di === parseInt(personToUpdate[0].id)) {
+                  return {...person, }
+                }
+              } person.id ? parseInt(personToUpdate[0].id) : returnedPerson.data))
+              console.log(persons)
+              
+            })
+            setTimeout(() => {
+              setNotification(null)
+              setNotificationStyle('')
+            }, 3000)
       }
 
     } else {
+      setNotification('Added ' + newName)
+      setNotificationStyle('notificationAdd')
       const newPerson = {
         name: newName,
         number: newNumber
@@ -122,7 +161,11 @@ const App = () => {
         .create(newPerson)
           .then(returnedPerson => {
             setPersons(persons.concat(returnedPerson))
-          })  
+          })
+          setTimeout(() => {
+            setNotification(null)
+            setNotificationStyle('')
+          }, 3000)
     }
   }
 
@@ -139,11 +182,20 @@ const App = () => {
     console.log(personToDelete) */
 
     if (window.confirm("Delete " + personToDelete[0].name)) {
+      setNotification(personToDelete[0].name + ' deleted')
+      setNotificationStyle('notificationDeleted')
       personService
       .deleteObject(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== parseInt(id)))
         })
+        .catch(error => {
+          setNotification('Information of ' + personToDelete[0].name + ' has already been removed from server')
+        })
+        setTimeout(() => {
+          setNotification(null)
+          setNotificationStyle('')
+        }, 3000)
     }
   }
 
@@ -158,6 +210,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification} notificationStyle={notificationStyle} />
       <Filter filterName={filterName} filterPerson={filterPerson} />
       <h2>add a new</h2>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
