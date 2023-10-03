@@ -111,6 +111,13 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
 
+    //tarkistetaan ettei tekstikenttiä ole jätetty tehjäksi. Jos nimeä tai numeroa ei ole annettu, tulee alertti ja pyydetään käyttäjää täyttämään kentät
+    if (!newName) {
+      window.alert('Name missing')
+    } else if (!newNumber) {
+      window.alert('Number missing')
+    } else {
+
     //luodaan uusi jono joka sisältää vain henkilöiden nimet
     const personsName = persons.map(person => person.name)
     
@@ -184,7 +191,7 @@ const App = () => {
             setNotificationStyle('')
           }, 3000)
     }
-  }
+  }}
 
   //Delete napin painaminen saa aikaan tämän tapahtumakäsittelijän
   const deletePerson = (event) => {
