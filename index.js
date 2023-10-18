@@ -69,14 +69,17 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
+  Person.findById(req.params.id).then((person) => {
+    res.json(person);
+  });
 
-  if (person) {
+  //koodi jolla katotaan onko yhteystieto jo olemassa samalla nimellä
+  //tällä hetkellä ei katota tätä vielä kun muutetaan tietokanta mongoDB
+  /* if (person) {
     res.json(person);
   } else {
     res.status(404).end();
-  }
+  } */
 });
 
 app.post("/api/persons", (req, res) => {
@@ -103,14 +106,20 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  const person = {
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  });
+
+  /* const person = {
     id: Math.floor(Math.random() * 5000),
     name: body.name,
     number: body.number,
-  };
+  }; */
 
-  persons = persons.concat(person);
-  res.json(person);
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
