@@ -145,9 +145,8 @@ const App = () => {
           );
 
           console.log(personToUpdate);
-          console.log(personToUpdate.id);
 
-          const personId = parseInt(personToUpdate[0].id);
+          const personId = personToUpdate[0].id;
 
           console.log(personId);
 
@@ -197,9 +196,7 @@ const App = () => {
     console.log();
 
     //haetaan poistettava henkilö
-    const personToDelete = persons.filter(
-      (person) => person.id === parseInt(id)
-    );
+    const personToDelete = persons.filter((person) => person.id === id);
     console.log(personToDelete);
 
     //window.confirm varmistaa henkilön poistamisesta, jos varmistukseen painaa ok, poistetaan henkilö luettelosta
@@ -212,7 +209,7 @@ const App = () => {
       personService
         .deleteObject(id)
         .then(() => {
-          setPersons(persons.filter((person) => person.id !== parseInt(id)));
+          setPersons(persons.filter((person) => person.id !== id));
         }) //mikäli listasta yritetään poistaa henkilö, joka on jo poistettu, tulee virheilmoitus
         .catch((error) => {
           setNotification(

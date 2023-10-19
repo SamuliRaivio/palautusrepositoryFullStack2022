@@ -5,10 +5,7 @@ const app = express();
 const cors = require("cors");
 
 const Person = require("./models/person");
-
-app.use(express.static("dist"));
-
-app.use(cors());
+const person = require("./models/person");
 
 morgan.token("postData", (req) => {
   if (req.method === "POST") {
@@ -18,36 +15,30 @@ morgan.token("postData", (req) => {
   }
 });
 
-app.use(express.json());
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message);
 
+  if (error.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+const uknownEndpoint = (req, res) => {
+  res.status(400).send({ error: "uknown endpoint" });
+};
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static("dist"));
 app.use(
   morgan(
     ":method :url :status :res[content-length] - :response-time ms :postData"
   )
 );
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelance",
-    number: "123456789",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "987654321",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendick",
-    number: "123123123",
-  },
-];
+let persons = [];
 
 app.get("/", (req, res) => {
   res.send("<h1>puhelinluettelon backend</h1>");
@@ -68,24 +59,22 @@ app.get("/api/persons", (req, res) => {
   });
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  Person.findById(req.params.id).then((person) => {
-    res.json(person);
-  });
-
-  //koodi jolla katotaan onko yhteystieto jo olemassa samalla nimellä
-  //tällä hetkellä ei katota tätä vielä kun muutetaan tietokanta mongoDB
-  /* if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  } */
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (person) {
+        res.json(person);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons", (req, res) => {
   const body = req.body;
 
-  const nameExist = persons.find((person) => person.name === body.name);
+  /* const nameExist = persons.find((person) => person.name === body.name);
   const numExist = persons.find((person) => person.number === body.number);
 
   if (!body.name) {
@@ -104,7 +93,7 @@ app.post("/api/persons", (req, res) => {
     return res.status(400).json({
       error: "number must be unique",
     });
-  }
+  } */
 
   const person = new Person({
     name: body.name,
@@ -122,12 +111,36 @@ app.post("/api/persons", (req, res) => {
   });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((error) => next(error));
+});
+
+app.delete("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndRemove(req.params.id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
+
+  /* const id = Number(req.params.id);
   persons = persons.filter((person) => person.id !== id);
 
-  res.status(204).end();
+  res.status(204).end(); */
 });
+
+app.use(uknownEndpoint);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
