@@ -45,12 +45,17 @@ app.get("/", (req, res) => {
 });
 
 app.get("/info", (req, res) => {
-  const contacs = persons.length;
+  const time = new Date().toString();
+  Person.countDocuments({}).then((count) => {
+    res.send(`<p>Phonebook has info for ${count} people</p><p>${time}</p>`);
+  });
+  /* const contacs = Person.count({});
   const time = new Date().toString();
 
   console.log(time);
+  console.log(contacs);
 
-  res.send(`<p>Phonebook has info for ${contacs} people</p><p>${time}</p>`);
+  res.send(`<p>Phonebook has info for ${0} people</p><p>${time}</p>`); */
 });
 
 app.get("/api/persons", (req, res) => {
