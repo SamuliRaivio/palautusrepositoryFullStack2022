@@ -177,9 +177,20 @@ const App = () => {
         };
 
         //lisätään henkilö tietokantaan ja luodaan uusi lista henkilöitä joissa tämä uusi on mukana
-        personService.create(newPerson).then((returnedPerson) => {
-          setPersons(persons.concat(returnedPerson));
-        });
+        personService
+          .create(newPerson)
+          .then((returnedPerson) => {
+            setPersons(persons.concat(returnedPerson));
+          })
+          //catch ottaa errorit, tässä kohtaa backend heittää errorin mikäli annettujen tietojen
+          //validoinnissa on jotain vikaa, esimerkiksi nimen pituudelle on validuitu tietty mitta
+          //konsoliin sekä näytölle tulostetaan virheilmoitus
+          .catch((error) => {
+            setNotification(error.response.data.error);
+            setNotificationStyle("notificationDeleted");
+            console.log(error.response.data);
+          });
+
         setTimeout(() => {
           setNotification(null);
           setNotificationStyle("");
