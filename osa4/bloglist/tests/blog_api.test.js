@@ -58,29 +58,21 @@ test("blog indetification is id", async () => {
 });
 
 test("new blog can be added", async () => {
-  const newBlogData = {
+  const newBlog = {
     title: "test title 3",
     author: "test author 3",
     url: "www.testUrl3.com",
     likes: 30,
   };
 
-  await api.post(
-    "/api/blogs",
-    {
-      title: "test title 3",
-      author: "test author 3",
-      url: "www.testUrl3.com",
-      likes: 30,
-    },
-    {
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set("Content-Type", "application/json");
 
   const res = await api.get("/api/blogs");
 
-  expect(res.body).toHaveLength(initialBlogs.length + 1);
+  expect(res.body[2].title).toEqual(newBlog.title);
 });
 
 afterAll(async () => {
