@@ -1,10 +1,14 @@
 //blog.js sisältää bloggaus-olin skeeman määrittelyn
 // sekä sen exporttauksen muiden osien käyttöön
 const mongoose = require("mongoose");
+mongoose.set("strictQuery", false);
 
 const blogSchema = mongoose.Schema({
   title: String,
-  author: String,
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   url: String,
   likes: Number,
 });
