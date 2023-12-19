@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 
 const blogSchema = mongoose.Schema({
-  title: String,
+  title: { type: String, required: true },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
