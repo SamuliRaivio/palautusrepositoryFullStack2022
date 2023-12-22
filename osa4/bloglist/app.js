@@ -34,4 +34,7 @@ app.use("/api/login", loginRouter);
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", userRouter);
 
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
+
 module.exports = app;

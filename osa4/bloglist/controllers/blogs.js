@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 //Haetaan kaikki blogi-oliot tietokannasta
 blogsRouter.get("/", async (req, res) => {
-  const blogs = await Blog.find({}).populate("author", {
+  const blogs = await Blog.find({}).populate("user", {
     firstname: 1,
     lastname: 1,
   });
@@ -15,7 +15,6 @@ blogsRouter.get("/", async (req, res) => {
 
 //luodaan uusi blogi-olio tietokantaan
 //jos blogin tykkäyksille (likes) ei ole annettu arvoa, annetaan sille arvoksi 0
-//jos bodylle ei ole annettu käyttäjää (user), luodaan blogi ilman kirjoittajaa (author)
 blogsRouter.post("/", async (req, res) => {
   const body = req.body;
   let blog = {};
@@ -24,19 +23,14 @@ blogsRouter.post("/", async (req, res) => {
   if (!decodedToken.id) {
     return res.status(401).json({ error: "token invalid" });
   }
-  console.log(req.body);
+
   const user = req.body.user;
 
   if (body.userId) {
     blog = new Blog({
       title: body.title,
-      author: user._id,
-      url: body.url,
-      likes: body.likes,
-    });
-  } else {
-    blog = new Blog({
-      title: body.title,
+      author: body.author,
+      user: user._id,
       url: body.url,
       likes: body.likes,
     });
@@ -46,27 +40,13 @@ blogsRouter.post("/", async (req, res) => {
     blog.likes = 0;
   }
 
-  if (blog.title && blog.url) {
-    const savedBlog = await blog.save();
-    //jos käyttäjä on annettu, tallennetaan blogi myös käyttäjälle
-    if (body.userId) {
-      user.blogs = user.blogs.concat(savedBlog._id);
-      await user.save();
-    }
-
-    res.status(201).json(savedBlog);
-  } else {
-    res.status(400).json();
-  }
+  const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
+  res.status(201).json(savedBlog);
 });
 
 //blogin poisto
-//pyyntö hakee myös blogin kirjoittajan ja poistaa blogin kirjoittajalta (user.blogs)
-//koodi toteutettu niin että routen id:llä haetaan blogi ja blogista haetaan author eli user
-//user objektin blogit filtteröidään niin että => blog.toString() saadaan blogin id
-//näin voidaan verrata sitä routen id:ksi (req.params.id)
-//filtteröidään poistettava blogi pois ja tallennetaan päivitetty user olio
-//Blogin voi nyt poistaa vain blogin kirjoittaja tokenin avulla
 blogsRouter.delete("/:id", async (req, res) => {
   const blog = await Blog.findById(req.params.id);
 
@@ -75,7 +55,7 @@ blogsRouter.delete("/:id", async (req, res) => {
     return res.status(401).json({ error: "token invalid" });
   }
   const userloggenIn = req.body.user;
-  const user = await User.findById(blog.author);
+  const user = await User.findById(blog.user);
 
   if (user.id !== userloggenIn.id) {
     return res.status(401).json({ error: "invalid user" });

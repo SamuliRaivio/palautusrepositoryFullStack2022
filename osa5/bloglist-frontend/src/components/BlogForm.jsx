@@ -1,4 +1,12 @@
-const BlogForm = ({ title, setTitle, url, setUrl, addBlog }) => (
+const BlogForm = ({
+  title,
+  setTitle,
+  author,
+  setAuthor,
+  url,
+  setUrl,
+  addBlog,
+}) => (
   <div>
     <form onSubmit={addBlog}>
       <div>
@@ -8,6 +16,15 @@ const BlogForm = ({ title, setTitle, url, setUrl, addBlog }) => (
           value={title}
           name="Title"
           onChange={({ target }) => setTitle(target.value)}
+        ></input>
+      </div>
+      <div>
+        author:
+        <input
+          type="text"
+          value={author}
+          name="Title"
+          onChange={({ target }) => setAuthor(target.value)}
         ></input>
       </div>
       <div>

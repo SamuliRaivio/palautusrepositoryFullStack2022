@@ -13,6 +13,7 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
   const [notification, setNotification] = useState(null);
   const [notificationStyle, setNotificationStyle] = useState();
@@ -73,13 +74,19 @@ const App = () => {
     event.preventDefault();
 
     try {
-      const blogToAdd = { title: title, url: url, userId: user.id };
+      const blogToAdd = {
+        title: title,
+        author: author,
+        url: url,
+        userId: user.id,
+      };
       const newBlog = await blogService.create(blogToAdd);
       setBlogs(blogs.concat(newBlog));
-      setNotification(`${title} by ${user.firstname} ${user.lastname} added`);
+      setNotification(`${title} by ${author} added`);
       setNotificationStyle("notificationAdd");
     } catch (error) {
-      setNotification(error.message);
+      console.log(error);
+      setNotification(error.response.data.error);
       setNotificationStyle("notificationDeleted");
     }
 
@@ -126,6 +133,8 @@ const App = () => {
         <BlogForm
           title={title}
           setTitle={setTitle}
+          author={author}
+          setAuthor={setAuthor}
           url={url}
           setUrl={setUrl}
           addBlog={addBlog}

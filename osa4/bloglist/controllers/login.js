@@ -29,7 +29,9 @@ loginRouter.post("/", async (req, res) => {
   };
 
   //luodaan tokeni käyttäjälle
-  const token = jwt.sign(userForToken, process.env.SECRET);
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
 
   //mikäli kaikki ok palautetaan status ok ja lähetetään eteenpäin tokeni sekä tokenia käyttävän käyttäjän tiedot.
   res.status(200).send({

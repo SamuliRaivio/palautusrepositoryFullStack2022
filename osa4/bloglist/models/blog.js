@@ -5,11 +5,12 @@ mongoose.set("strictQuery", false);
 
 const blogSchema = mongoose.Schema({
   title: { type: String, required: true },
-  author: {
+  author: String,
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  url: String,
+  url: { type: String, required: true },
   likes: Number,
 });
 
