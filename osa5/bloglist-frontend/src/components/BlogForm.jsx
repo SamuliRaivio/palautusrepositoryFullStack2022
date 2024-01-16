@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const BlogForm = ({ user, createBlog }) => {
   const [title, setTitle] = useState("");
@@ -53,6 +54,12 @@ const BlogForm = ({ user, createBlog }) => {
       </form>
     </div>
   );
+};
+
+//määritellään propsit pakollisiksi
+BlogForm.propTypes = {
+  user: PropTypes.object.isRequired,
+  createBlog: PropTypes.func.isRequired,
 };
 
 export default BlogForm;

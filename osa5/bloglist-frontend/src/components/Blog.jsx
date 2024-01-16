@@ -10,8 +10,6 @@ const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
     return false;
   };
 
-  console.log(blogByUser());
-
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
