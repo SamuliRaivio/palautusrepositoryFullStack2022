@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -6,15 +6,13 @@ import LoginForm from "./components/LogInForm";
 import BlogForm from "./components/BlogForm";
 import "./App.css";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
   const [notification, setNotification] = useState(null);
   const [notificationStyle, setNotificationStyle] = useState();
 
@@ -33,6 +31,10 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+
+  const blogFormRef = useRef();
+
+  const sortedBlogsByLikes = blogs.sort((a, b) => b.likes - a.likes);
 
   //Kirjautumisformin eventhandler
   //mikäli kirjautuminen onnistuu, tallennetaan käyttäjä local storageen ja päästetään käyttäjä sisään
@@ -70,19 +72,12 @@ const App = () => {
 
   //blogiformin eventhandler
   //lisätään blogi ja tulostetaan ilmoitus onnistuneesta ja epäonnistuneesta lisäyksestä
-  const addBlog = async (event) => {
-    event.preventDefault();
-
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.changeVisibility();
     try {
-      const blogToAdd = {
-        title: title,
-        author: author,
-        url: url,
-        userId: user.id,
-      };
-      const newBlog = await blogService.create(blogToAdd);
+      const newBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat(newBlog));
-      setNotification(`${title} by ${author} added`);
+      setNotification(`${blogObject.title} by ${blogObject.author} added`);
       setNotificationStyle("notificationAdd");
     } catch (error) {
       console.log(error);
@@ -94,6 +89,31 @@ const App = () => {
       setNotification(null);
       setNotificationStyle("");
     }, 3000);
+  };
+
+  const addLikeToBlog = async (id, blogObject) => {
+    try {
+      const updatedBlog = await blogService.update(id, blogObject);
+      setBlogs(
+        blogs.map((blog) => {
+          if (blog.id === updatedBlog.id) {
+            return { ...blog, likes: blog.likes + 1 };
+          }
+          return blog;
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const removeBlog = async (id) => {
+    try {
+      await blogService.remove(id);
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   //mikäli user arvo = null, sivulle tulostetaan vain login form
@@ -121,28 +141,34 @@ const App = () => {
   return (
     <div>
       <div>
+        <p style={{ display: "inline" }}>
+          {user.firstname} {user.lastname} logged in
+        </p>
         <button onClick={handleLogOutClick}>logout</button>
       </div>
       <div>
-        <Notification
-          notification={notification}
-          notificationStyle={notificationStyle}
-        />
+        <h3>CREATE NEW BLOG</h3>
+        <div>
+          <Notification
+            notification={notification}
+            notificationStyle={notificationStyle}
+          />
+        </div>
+        <div>
+          <Togglable buttonLabel="newBlog" ref={blogFormRef}>
+            <BlogForm createBlog={addBlog} user={user} />
+          </Togglable>
+        </div>
       </div>
-      <div>
-        <BlogForm
-          title={title}
-          setTitle={setTitle}
-          author={author}
-          setAuthor={setAuthor}
-          url={url}
-          setUrl={setUrl}
-          addBlog={addBlog}
-        />
-      </div>
-      <h2>blogs</h2>
+      <h3>BLOGS</h3>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          likeBlog={addLikeToBlog}
+          blogToRemove={removeBlog}
+          user={user}
+        />
       ))}
     </div>
   );
