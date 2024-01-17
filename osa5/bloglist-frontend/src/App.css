@@ -18,7 +18,7 @@
   margin-bottom: 10px;
 }
 
-.notificationDeleted {
+.error {
   color: red;
   background: lightgrey;
   font-size: 20px;
@@ -26,4 +26,12 @@
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+}
+
+.blogStyle {
+  padding-top: 10px;
+  padding-left: 20px;
+  border: solid;
+  border-width: 2px;
+  margin-bottom: 5px;
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "../App.css";
 
 const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
   const [showAllData, setShowAllData] = useState(false);
@@ -10,13 +11,13 @@ const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
     return false;
   };
 
-  const blogStyle = {
+  /* const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
     border: "solid",
     borderWidth: 1,
     marginBottom: 5,
-  };
+  }; */
 
   const addLike = (event) => {
     event.preventDefault();
@@ -41,7 +42,7 @@ const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div className="blogStyle">
       <div style={{ display: "" }}>
         title: {blog.title} author: {blog.author}
         {!showAllData && (

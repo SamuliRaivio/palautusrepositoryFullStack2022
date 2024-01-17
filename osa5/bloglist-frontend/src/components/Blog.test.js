@@ -29,8 +29,6 @@ test("renders url, likes and user's first and lastname when view button is press
     user: testUser,
   };
 
-  //const mockHandler = jest.fn();
-
   render(<Blog blog={testBlog} user={testUser} />);
   const user = userEvent.setup();
   const viewButton = screen.getByText("view");

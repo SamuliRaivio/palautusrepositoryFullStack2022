@@ -55,7 +55,7 @@ const App = () => {
       setPassword("");
     } catch (exception) {
       setNotification("Wrong username or password");
-      setNotificationStyle("notificationDeleted");
+      setNotificationStyle("error");
     }
     setTimeout(() => {
       setNotification(null);
@@ -82,7 +82,7 @@ const App = () => {
     } catch (error) {
       console.log(error);
       setNotification(error.response.data.error);
-      setNotificationStyle("notificationDeleted");
+      setNotificationStyle("error");
     }
 
     setTimeout(() => {
