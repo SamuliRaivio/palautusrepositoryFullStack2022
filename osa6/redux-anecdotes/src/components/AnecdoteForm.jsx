@@ -8,7 +8,7 @@ const NewAnecdote = () => {
     event.preventDefault();
 
     const content = event.target.anecdote.value;
-    event.target.value = "";
+    event.target.anecdote.value = "";
     dispatch(createAnecdote(content));
   };
 

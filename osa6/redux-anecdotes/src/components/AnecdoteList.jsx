@@ -18,13 +18,10 @@ const Anecdotes = () => {
   const dispatch = useDispatch();
   const anecdotes = useSelector((state) => state.anecdotes);
   const filterValue = useSelector((state) => state.filter);
-  const sortedBlogsByLikes = anecdotes.sort((a, b) => b.votes - a.votes);
 
   const anecdotesToShow = anecdotes.filter((anecdote) =>
     anecdote.content.includes(filterValue)
   );
-
-  console.log("value:" + filterValue);
 
   return (
     <div>
