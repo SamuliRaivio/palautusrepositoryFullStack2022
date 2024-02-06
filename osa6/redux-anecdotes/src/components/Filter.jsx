@@ -6,7 +6,6 @@ const Filter = () => {
   const anecdotes = useSelector((state) => state.anecdotes);
 
   const handleChange = (event) => {
-    // input-kentän arvo muuttujassa event.target.value
     dispatch(filterAnecdote(event.target.value));
   };
   const style = {
