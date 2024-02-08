@@ -15,4 +15,9 @@ const createNew = async (content) => {
   return res.data;
 };
 
-export default { getAll, createNew };
+//editing data backend / voting anecdote
+const voteObject = async (obj) => {
+  const res = await axios.put(`${baseUrl}/${obj.id}`, obj);
+};
+
+export default { getAll, createNew, voteObject };
