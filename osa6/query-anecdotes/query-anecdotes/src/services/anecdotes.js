@@ -11,10 +11,14 @@ const getAll = () => axios.get(baseUrl).then((res) => res.data);
   const res = await axios.post(baseUrl, obj);
   return res.data;
 }; */
+const createNew = (content) => {
+  const obj = { content, votes: 0 };
+  axios.post(baseUrl, obj).then((res) => res.data);
+};
 
 //put/edit anecdote
 /* const update = async (obj) => {
   const res = await axios.put(`${baseUrl}/${obj.id}`, obj);
 }; */
 
-export default { getAll /* createNew */ /* update */ };
+export default { getAll, createNew /* update */ };
