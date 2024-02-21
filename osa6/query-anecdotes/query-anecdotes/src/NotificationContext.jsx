@@ -18,16 +18,23 @@ const notificationReducer = (state, action) => {
   switch (action.type) {
     case "NEW":
       console.log(state);
-      const newMessage = `anecdote '${action.payload}' created`;
-      const newState = { style: messageStyle, message: newMessage };
-      console.log(newState);
-      return newState;
+      const createdMessage = `anecdote '${action.payload}' created`;
+      const createdState = { style: messageStyle, message: createdMessage };
+      console.log(createdState);
+      return createdState;
     case "VOTE":
-      return state;
+      const votedMessage = `anecdote '${action.payload}' voted`;
+      const votedState = { style: messageStyle, message: votedMessage };
+      return votedState;
     case "LENGTHERR":
-      return state;
+      const errorLengthMessage = `ERROR anecdote must be at over 4 char`;
+      const errorLenghtState = {
+        style: messageStyle,
+        message: errorLengthMessage,
+      };
+      return errorLenghtState;
     case "HIDE":
-      return state;
+      return initialState;
     default:
       return state;
   }

@@ -16,6 +16,9 @@ const AnecdoteForm = ({ newAnecdoteMutation }) => {
     console.log("new anecdote");
     newAnecdoteMutation.mutate(content);
     dispatch({ type: "NEW", payload: content });
+    setTimeout(() => {
+      dispatch({ type: "HIDE" });
+    }, 5000);
   };
 
   return (

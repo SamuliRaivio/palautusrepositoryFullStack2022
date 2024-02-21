@@ -7,8 +7,10 @@ import NotificationContext, {
   NotificationCotextProvider,
 } from "./NotificationContext";
 import { useContext } from "react";
+import Anecdotes from "./components/Anecdotes";
 
 const App = () => {
+  const [state, dispatch] = useContext(NotificationContext);
   const queryClient = useQueryClient();
 
   //mutation for posting data to server
@@ -16,6 +18,12 @@ const App = () => {
   //after success mutation invalidates old query anecdotes to get updated data from server
   const newAnecdoteMutation = useMutation({
     mutationFn: anecdoteService.createNew,
+    onError: () => {
+      dispatch({ type: "LENGTHERR" });
+      setTimeout(() => {
+        dispatch({ type: "HIDE" });
+      }, 5000);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
     },
@@ -52,12 +60,12 @@ const App = () => {
 
   //handles voting the anecdote
   //calls updateAnecdoteMutation's mutate funktion to vote anecdote
-  const handleVote = (anecdote) => {
+  /* const handleVote = (anecdote) => {
     //dispatch("NEW");
     console.log(anecdote);
     const updatedAnecdote = { ...anecdote, votes: anecdote.votes + 1 };
     updateAnecdoteMutation.mutate(updatedAnecdote);
-  };
+  }; */
 
   const anecdotes = result.data;
 
@@ -65,12 +73,15 @@ const App = () => {
     <div>
       <h3>Anecdote app</h3>
 
-      <NotificationCotextProvider>
-        <Notification />
+      <Notification />
 
-        <AnecdoteForm newAnecdoteMutation={newAnecdoteMutation} />
+      <AnecdoteForm newAnecdoteMutation={newAnecdoteMutation} />
 
-        {anecdotes.map((anecdote) => (
+      <Anecdotes
+        updateAnecdoteMutation={updateAnecdoteMutation}
+        anecdotes={anecdotes}
+      />
+      {/* {anecdotes.map((anecdote) => (
           <div key={anecdote.id}>
             <div>{anecdote.content}</div>
             <div>
@@ -78,8 +89,7 @@ const App = () => {
               <button onClick={() => handleVote(anecdote)}>vote</button>
             </div>
           </div>
-        ))}
-      </NotificationCotextProvider>
+        ))} */}
     </div>
   );
 };
