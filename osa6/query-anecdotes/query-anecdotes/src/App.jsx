@@ -7,8 +7,19 @@ import anecdoteService from "./services/anecdotes";
 const App = () => {
   const queryClient = useQueryClient();
 
+  //mutation for posting data to server
+  //mutation calls createNew funkiton to post data to server
+  //after success mutation invalidates old query anecdotes to get updated data from server
   const newAnecdoteMutation = useMutation({
     mutationFn: anecdoteService.createNew,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
+    },
+  });
+
+  //basically same as newAnecdoteMutation but with voting the anecdote
+  const updateAnecdoteMutation = useMutation({
+    mutationFn: anecdoteService.update,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
     },
@@ -35,8 +46,12 @@ const App = () => {
     return <div>anecdote service not available due to problems in server</div>;
   }
 
+  //handles voting the anecdote
+  //calls updateAnecdoteMutation's mutate funktion to vote anecdote
   const handleVote = (anecdote) => {
-    console.log("vote");
+    console.log(anecdote);
+    const updatedAnecdote = { ...anecdote, votes: anecdote.votes + 1 };
+    updateAnecdoteMutation.mutate(updatedAnecdote);
   };
 
   const anecdotes = result.data;

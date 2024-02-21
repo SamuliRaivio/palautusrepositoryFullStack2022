@@ -1,4 +1,6 @@
-const AnecdoteForm = (newAnecdoteMutation = { newAnecdoteMutation }) => {
+//Anecdoteform handles users input for new anecdote
+//onSubmit component calls newAnecdoteMutations mutate funktion to add new anecdote
+const AnecdoteForm = ({ newAnecdoteMutation }) => {
   const onCreate = (event) => {
     event.preventDefault();
     const content = event.target.anecdote.value;
