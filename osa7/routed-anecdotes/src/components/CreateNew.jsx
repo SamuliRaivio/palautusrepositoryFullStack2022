@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 //CreateNew renders form to create new anecdotes
-//addnew function is in the app component and is called from props
+//addnew and showNotification functions are in the app component and are called from props
 const CreateNew = (props) => {
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
   const [info, setInfo] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,6 +17,9 @@ const CreateNew = (props) => {
       info,
       votes: 0,
     });
+    props.showNotification(`a new anecdote ${content} created!`);
+    //navigates back to main screen after new anecdote is made
+    navigate("/");
   };
 
   return (

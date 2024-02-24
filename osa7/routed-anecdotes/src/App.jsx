@@ -25,6 +25,10 @@ const App = () => {
 
   const [notification, setNotification] = useState("");
 
+  const showNotification = (newNotification) => {
+    setNotification(newNotification);
+    setTimeout(() => setNotification(""), 5000);
+  };
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
     setAnecdotes(anecdotes.concat(anecdote));
@@ -46,9 +50,15 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
+      {notification}
       <Router>
-        <Menu anecdotes={anecdotes} addNew={addNew} />
+        <Menu
+          anecdotes={anecdotes}
+          addNew={addNew}
+          showNotification={showNotification}
+        />
       </Router>
+
       <Footer />
     </div>
   );

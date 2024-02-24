@@ -11,7 +11,7 @@ import CreateNew from "./CreateNew";
 import Anecdote from "./Anecdote";
 
 //Menu renders react router and passes funtions from App to other components
-const Menu = ({ anecdotes, addNew }) => {
+const Menu = ({ anecdotes, addNew, showNotification }) => {
   const padding = {
     paddingRight: 5,
   };
@@ -39,7 +39,12 @@ const Menu = ({ anecdotes, addNew }) => {
       <Routes>
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/about" element={<About />} />
-        <Route path="/create" element={<CreateNew addNew={addNew} />} />
+        <Route
+          path="/create"
+          element={
+            <CreateNew addNew={addNew} showNotification={showNotification} />
+          }
+        />
         <Route
           path="/anecdotes/:id"
           element={<Anecdote anecdote={anecdote} />}
