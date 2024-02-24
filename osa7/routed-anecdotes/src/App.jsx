@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Footer from "./components/Footer";
 import Menu from "./components/Menu";
+import { BrowserRouter as Router } from "react-router-dom";
 
 //components moved to components folder from original sourcecode
 //App contains initial anecdotes, functions and renders menu that contains react router for other components and footer component
@@ -45,7 +46,9 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Menu anecdotes={anecdotes} addNew={addNew} />
+      <Router>
+        <Menu anecdotes={anecdotes} addNew={addNew} />
+      </Router>
       <Footer />
     </div>
   );
