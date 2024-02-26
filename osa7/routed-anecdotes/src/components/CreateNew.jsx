@@ -1,15 +1,12 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useField } from "../hooks";
 
 //CreateNew renders form to create new anecdotes
 //addnew and showNotification functions are in the app component and are called from props
 const CreateNew = (props) => {
-  //const [content, setContent] = useState("");
-  //const [author, setAuthor] = useState("");
-  //const [info, setInfo] = useState("");
   const navigate = useNavigate();
 
+  //custom hook is used for these
   const content = useField("text");
   const author = useField("text");
   const info = useField("text");
@@ -27,31 +24,33 @@ const CreateNew = (props) => {
     navigate("/");
   };
 
+  //.reset is build inside the custom hooks to setValue to ""
+  const handleReset = (e) => {
+    e.preventDefault();
+    content.reset();
+    author.reset();
+    info.reset();
+  };
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} onReset={handleReset}>
         <div>
           content
-          <input {...content} />
+          <input id="content" {...content.inputProps} />
         </div>
         <div>
           author
-          <input {...author} />
+          <input id="author" {...author.inputProps} />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input id="info" {...info.inputProps} />
         </div>
         <input type="submit" value="create" />
-        <input
-          type="button"
-          value="asd"
-          onClick={() => document.activeElement.value.reset}
-        />
-        <p>{document.activeElement.value}</p>
+        <input type="reset" value="reset" />
       </form>
-      <p></p>
     </div>
   );
 };

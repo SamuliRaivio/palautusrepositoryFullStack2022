@@ -25,6 +25,7 @@ const App = () => {
 
   const [notification, setNotification] = useState("");
 
+  //sets notification state and sets it back to "" after 5 secounds
   const showNotification = (newNotification) => {
     setNotification(newNotification);
     setTimeout(() => setNotification(""), 5000);
