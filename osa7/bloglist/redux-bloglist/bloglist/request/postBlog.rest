@@ -1,0 +1,13 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdHRpbWVpa2FsYWluZW4iLCJpZCI6IjY1ODAwOTA0NjdmZTc2MGI1NjZkMmZkMCIsImlhdCI6MTcwMzA2NTkwMX0.nIn0zZ1wEUqPFigdZFhT_N3dhKaK2460GMtrZ9TPi7g
+
+
+  
+  {
+    "title": "",
+    "author": "testi",
+    "userId": "6580090467fe760b566d2fd",
+    "url": "blog.matti.com/2",
+    "likes": 84
+  }
