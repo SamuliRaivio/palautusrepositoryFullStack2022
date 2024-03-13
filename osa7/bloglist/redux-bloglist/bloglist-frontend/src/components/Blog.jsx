@@ -1,7 +1,11 @@
 import { useState } from "react";
 import "../App.css";
+import { useDispatch } from "react-redux";
+import { likeBlog, removeBlog } from "../reducers/blogReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
-const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
+const Blog = ({ blog, user }) => {
+  const dispatch = useDispatch();
   const [showAllData, setShowAllData] = useState(false);
 
   const blogByUser = () => {
@@ -11,33 +15,30 @@ const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
     return false;
   };
 
-  /* const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  }; */
-
   const addLike = (event) => {
     event.preventDefault();
-    likeBlog(blog.id, {
+    const likedBlog = {
       title: blog.title,
       author: blog.author,
       url: blog.url,
       likes: blog.likes + 1,
-    });
+    };
+    dispatch(likeBlog(blog.id, likedBlog));
   };
 
-  const removeBlog = (event) => {
+  const deleteBlog = (event) => {
     event.preventDefault();
 
-    if (
-      confirm(
-        `Are you sure you want to remove ${blog.title} by ${blog.author}?`
-      )
-    ) {
-      blogToRemove(blog.id);
+    const confirmMessage = `Are you sure you want to remove ${blog.title} by ${blog.author}?`;
+    const notificationMessage = `${blog.title} by ${blog.author} removed`;
+    if (confirm(confirmMessage)) {
+      try {
+        dispatch(removeBlog(blog.id));
+        dispatch(setNotification("success", notificationMessage));
+      } catch (error) {
+        console.log(error);
+        dispatch(setNotification("error", error.response.data.error));
+      }
     }
   };
 
@@ -56,7 +57,7 @@ const Blog = ({ blog, likeBlog, blogToRemove, user }) => {
             url: {blog.url} <br />
             likes: {blog.likes} <button onClick={addLike}>like</button> <br />
             user: {blog.user.firstname} {blog.user.lastname} <br />
-            {blogByUser() && <button onClick={removeBlog}>remove</button>}
+            {blogByUser() && <button onClick={deleteBlog}>remove</button>}
           </div>
         )}
       </div>

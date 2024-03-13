@@ -1,4 +1,4 @@
-.notificationAdd {
+.success {
   color: green;
   background: lightgrey;
   font-size: 20px;
@@ -26,6 +26,10 @@
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+}
+
+.none {
+  display: "none";
 }
 
 .blogStyle {
